@@ -2,6 +2,7 @@ import time
 
 from flask import Flask, redirect, request, session, url_for
 from flask_login import current_user
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 from app.auth.routes import bp as auth_bp
 from app.billing.routes import bp as billing_bp
@@ -35,6 +36,7 @@ def create_app(config_class=Config):
         static_folder="static",
     )
     app.config.from_object(config_class)
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1)
 
     db.init_app(app)
     login_manager.init_app(app)

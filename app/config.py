@@ -14,21 +14,49 @@ def _get_env_string(name, default=""):
     return os.getenv(name, default).strip()
 
 
+def _get_env_bool(name, default=False):
+    value = _get_env_string(name, "")
+    if not value:
+        return default
+    return value.lower() in {"1", "true", "yes", "on"}
+
+
+def _default_app_base_url():
+    configured = _get_env_string("APP_BASE_URL", "")
+    if configured:
+        return configured.rstrip("/")
+
+    render_url = _get_env_string("RENDER_EXTERNAL_URL", "")
+    if render_url:
+        return render_url.rstrip("/")
+
+    return "http://127.0.0.1:5000"
+
+
+def _default_upload_root():
+    configured = _get_env_string("UPLOAD_ROOT", "")
+    if configured:
+        return Path(configured).expanduser()
+    return BASE_DIR / "app" / "uploads"
+
+
 class Config:
+    APP_BASE_URL = _default_app_base_url()
+    _HTTPS_ENABLED = APP_BASE_URL.startswith("https://") or _get_env_bool("RENDER", False)
     SECRET_KEY = _get_env_string("SECRET_KEY", "dev-secret-change-me")
     SQLALCHEMY_DATABASE_URI = os.getenv(
         "DATABASE_URL",
         f"sqlite:///{(INSTANCE_DIR / 'vidsnapai.db').as_posix()}",
     ).strip()
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    PREFERRED_URL_SCHEME = "https" if _get_env_string("APP_BASE_URL", "").startswith("https://") else "http"
+    PREFERRED_URL_SCHEME = "https" if _HTTPS_ENABLED else "http"
     REMEMBER_COOKIE_HTTPONLY = True
-    REMEMBER_COOKIE_SECURE = PREFERRED_URL_SCHEME == "https"
+    REMEMBER_COOKIE_SECURE = _HTTPS_ENABLED
     SESSION_COOKIE_HTTPONLY = True
-    SESSION_COOKIE_SECURE = PREFERRED_URL_SCHEME == "https"
+    SESSION_COOKIE_SECURE = _HTTPS_ENABLED
     SESSION_COOKIE_SAMESITE = "Lax"
     MAX_CONTENT_LENGTH = int(os.getenv("MAX_CONTENT_LENGTH", 1024 * 1024 * 200))
-    UPLOAD_ROOT = BASE_DIR / "app" / "uploads"
+    UPLOAD_ROOT = _default_upload_root()
     ALLOWED_IMAGE_EXTENSIONS = {"png", "jpg", "jpeg", "webp"}
     ALLOWED_VIDEO_EXTENSIONS = {"mp4", "mov", "webm", "m4v"}
     ALLOWED_AUDIO_EXTENSIONS = {"mp3", "wav", "m4a"}
@@ -37,7 +65,6 @@ class Config:
     MAX_SOCIAL_ACCOUNTS_PER_USER = int(os.getenv("MAX_SOCIAL_ACCOUNTS_PER_USER", "10"))
     LIFETIME_PLAN_PRICE_INR = int(os.getenv("LIFETIME_PLAN_PRICE_INR", "399"))
     LIFETIME_PLAN_CURRENCY = _get_env_string("LIFETIME_PLAN_CURRENCY", "INR").upper()
-    APP_BASE_URL = _get_env_string("APP_BASE_URL", "http://127.0.0.1:5000").rstrip("/")
     RAZORPAY_KEY_ID = _get_env_string("RAZORPAY_KEY_ID", "")
     RAZORPAY_KEY_SECRET = _get_env_string("RAZORPAY_KEY_SECRET", "")
     RAZORPAY_WEBHOOK_SECRET = _get_env_string("RAZORPAY_WEBHOOK_SECRET", "")
@@ -57,6 +84,7 @@ class Config:
     META_REQUEST_TIMEOUT_SECONDS = int(os.getenv("META_REQUEST_TIMEOUT_SECONDS", "20"))
     SOCIAL_TOKEN_ENCRYPTION_SECRET = _get_env_string("SOCIAL_TOKEN_ENCRYPTION_SECRET", SECRET_KEY)
     FREE_EXPORT_WATERMARK_TEXT = _get_env_string("FREE_EXPORT_WATERMARK_TEXT", "VidSnapAI Free")
+    FFMPEG_FONT_PATH = _get_env_string("FFMPEG_FONT_PATH", "")
     META_SCOPES_INSTAGRAM = [
         "pages_show_list",
         "pages_read_engagement",

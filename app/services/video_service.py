@@ -185,8 +185,15 @@ def _escape_drawtext(value):
 
 
 def _font_clause():
-    font_path = Path("C:/Windows/Fonts/arial.ttf")
-    if font_path.exists():
-        escaped = str(font_path).replace("\\", "/").replace(":", "\\:")
-        return f"fontfile='{escaped}':"
+    configured_font = current_app.config.get("FFMPEG_FONT_PATH", "").strip()
+    candidate_paths = [
+        Path(configured_font) if configured_font else None,
+        Path("C:/Windows/Fonts/arial.ttf"),
+        Path("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"),
+        Path("/usr/share/fonts/truetype/liberation2/LiberationSans-Regular.ttf"),
+    ]
+    for font_path in candidate_paths:
+        if font_path and font_path.exists():
+            escaped = str(font_path).replace("\\", "/").replace(":", "\\:")
+            return f"fontfile='{escaped}':"
     return ""

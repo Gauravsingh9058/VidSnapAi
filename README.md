@@ -166,9 +166,12 @@ python generate_process.py
 
 ## Deployment notes
 
-- Put Flask behind Gunicorn, Waitress, or another production WSGI server.
-- Use PostgreSQL in production.
-- Use Cloudinary or S3-style storage for generated files in production.
+- Render deployment files are included: [Dockerfile](/d:/ALL%20IN%20ONE/MyProjects/3.VidSnapAI/Dockerfile) and [render.yaml](/d:/ALL%20IN%20ONE/MyProjects/3.VidSnapAI/render.yaml).
+- The Render blueprint is production-oriented and uses a paid web service plus a persistent disk so uploaded inputs and generated videos survive deploys and restarts.
+- Use PostgreSQL in production. The included `render.yaml` provisions a Render Postgres database and wires its `connectionString` into `DATABASE_URL`.
+- If you prefer Render's free tier, configure Cloudinary first and remove the persistent disk requirement. Free web services spin down and do not support persistent disks, so local uploads are not durable there.
+- Render sets `RENDER_EXTERNAL_URL`, and this app now uses it automatically as the default public base URL when `APP_BASE_URL` is not set.
+- Gunicorn is included for production startup, and the Docker image installs `ffmpeg` plus a Linux font so video text rendering works on Render.
 - Wire the published post execution to the live Meta Graph API endpoints before calling the Instagram/Facebook autopost flow fully complete.
 - Replace the background thread worker with Celery, RQ, or another queue for scale.
 - Set a strong `SECRET_KEY` and production-safe cookie configuration.

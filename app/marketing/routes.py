@@ -4,6 +4,11 @@ from flask import Blueprint, render_template
 bp = Blueprint("marketing", __name__)
 
 
+@bp.route("/healthz")
+def healthz():
+    return {"status": "ok"}, 200
+
+
 @bp.route("/")
 def landing():
     testimonials = [

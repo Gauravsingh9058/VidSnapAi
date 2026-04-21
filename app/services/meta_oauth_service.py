@@ -7,7 +7,7 @@ from datetime import datetime, timedelta, timezone
 from urllib.parse import urlencode
 
 import requests
-from flask import current_app, url_for
+from flask import current_app, has_request_context, url_for
 
 from app.extensions import db
 from app.models import OAuthState, PendingSocialAccountSelection, SocialAccount
@@ -53,6 +53,8 @@ def get_meta_redirect_uri():
     configured = current_app.config["META_REDIRECT_URI"].strip()
     if configured:
         return configured
+    if has_request_context():
+        return url_for("social.meta_callback", _external=True)
     base_url = current_app.config["APP_BASE_URL"].rstrip("/")
     return f"{base_url}{url_for('social.meta_callback')}"
 
