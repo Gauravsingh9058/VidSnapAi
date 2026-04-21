@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="dashboard-grid preview-layout">
+    <article class="panel large-panel">
+        <div class="panel-header">
+            <div>
+                <span class="eyebrow">Post preview</span>
+                <h2>{{ video.title }}</h2>
+            </div>
+            <div class="button-row">
+                {% if video.is_ready %}
+                    <a class="button button-secondary" href="{{ url_for('video.download_video', video_id=video.id) }}">Download</a>
+                {% endif %}
+                <form method="post" action="{{ url_for('video.delete_video', video_id=video.id) }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="next" value="{{ url_for('history.index') }}">
+                    <button class="button button-ghost" type="submit">Delete</button>
+                </form>
+            </div>
+        </div>
+        <div class="video-player-shell" {% if not video.is_ready %}data-status-poll="{{ url_for('video.video_status', video_id=video.id) }}"{% endif %}>
+            {% if video.is_ready %}
+                <video controls playsinline class="preview-player">
+                    <source src="{{ url_for('video.stream_video', video_id=video.id) }}" type="video/mp4">
+                </video>
+            {% else %}
+                <div class="empty-state">
+                    <strong>{% if video.status == 'failed' %}Generation failed{% else %}Video not ready yet{% endif %}</strong>
+                    <p data-status-copy>{{ video.error_message or 'The generation is still processing in the background. This page will refresh automatically when it is ready.' }}</p>
+                </div>
+            {% endif %}
+        </div>
+    </article>
+
+    <article class="panel">
+        <div class="panel-header">
+            <div>
+                <span class="eyebrow">Generation output</span>
+                <h2>Video details</h2>
+            </div>
+        </div>
+        <div class="detail-list">
+            <div><span>Topic</span><strong>{{ video.topic }}</strong></div>
+            <div><span>Style</span><strong>{{ video.style|replace('-', ' ')|title }}</strong></div>
+            <div><span>Language</span><strong>{{ video.language|title }}</strong></div>
+            <div><span>Duration</span><strong>{{ video.duration }} sec</strong></div>
+            <div><span>Format</span><strong>{{ video.aspect_ratio }}</strong></div>
+            <div><span>Status</span><strong class="status status-{{ video.status }}">{{ video.status }}</strong></div>
+            <div><span>Storage</span><strong>{{ video.storage_provider|title }}</strong></div>
+            <div><span>Export mode</span><strong>{% if current_user.is_premium %}Watermark-free{% else %}Watermarked free export{% endif %}</strong></div>
+        </div>
+    </article>
+</section>
+
+<section class="panel">
+    <div class="panel-header">
+        <div>
+            <span class="eyebrow">Publish flow</span>
+            <h2>Edit caption, choose platform, post now or schedule</h2>
+        </div>
+    </div>
+    <form method="post" class="stack-form">
+        {{ form.hidden_tag() }}
+        {% if not video.is_ready %}
+            <div class="empty-state">
+                <strong>Waiting for the final render</strong>
+                <p>Caption editing, scheduling, and direct posting unlock as soon as the reel finishes processing.</p>
+            </div>
+        {% endif %}
+        <div class="form-grid preview-form-grid">
+            <label class="span-2">
+                <span>Caption editor</span>
+                {{ form.caption_text(class="input textarea", disabled=not video.is_ready) }}
+            </label>
+            <label class="span-2">
+                <span>Hashtag editor</span>
+                {{ form.hashtags_text(class="input textarea", disabled=not video.is_ready) }}
+            </label>
+            <label>
+                <span>Platform selector</span>
+                {{ form.social_account_id(class="input", disabled=not video.is_ready) }}
+            </label>
+            <label>
+                <span>Schedule picker</span>
+                {{ form.scheduled_time(class="input", disabled=not video.is_ready) }}
+            </label>
+        </div>
+        {% if caption_set %}
+            <div class="caption-preview">
+                <div>
+                    <span class="eyebrow">CTA preview</span>
+                    <strong>{{ caption_set.cta }}</strong>
+                </div>
+                <div>
+                    <span class="eyebrow">First comment</span>
+                    <p>{{ caption_set.first_comment }}</p>
+                </div>
+            </div>
+        {% endif %}
+        {% if not connected_accounts %}
+            <div class="empty-state">
+                <strong>No connected accounts yet</strong>
+                <p>Connect Instagram or Facebook before direct publishing or scheduling.</p>
+                <a class="button button-secondary" href="{{ url_for('social.index') }}">Connect accounts</a>
+            </div>
+        {% endif %}
+        {% if not current_user.is_premium %}
+            <div class="setup-note">
+                <strong>Premium unlock</strong>
+                <p>Direct publishing and scheduling are available after upgrading your workspace to lifetime access.</p>
+            </div>
+        {% endif %}
+        <div class="button-row">
+            <button class="button button-primary" type="submit" name="action" value="publish" {% if not video.is_ready %}disabled{% endif %}>Publish now</button>
+            <button class="button button-secondary" type="submit" name="action" value="schedule" {% if not video.is_ready %}disabled{% endif %}>Schedule post</button>
+            <button class="button button-ghost" type="submit" name="action" value="draft" {% if not video.is_ready %}disabled{% endif %}>Save draft</button>
+        </div>
+    </form>
+</section>
+{% endblock %}

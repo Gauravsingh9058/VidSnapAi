@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block public_content %}
+<section class="section pricing-page legal-page">
+    <div class="section-heading narrow">
+        <span class="eyebrow">Legal</span>
+        <h1>Privacy Policy</h1>
+        <p>VidSnapAI stores only the information needed to authenticate users, process payments, generate projects, and connect optional social accounts.</p>
+    </div>
+    <div class="panel legal-panel">
+        <div class="stack-list">
+            <div class="list-row list-row-tall"><div><strong>Account data</strong><span>Name, email, password hash, plan state, and notification preferences are stored to operate your workspace.</span></div></div>
+            <div class="list-row list-row-tall"><div><strong>Project data</strong><span>Uploaded assets, generated reels, thumbnails, captions, and job history are stored so users can manage their projects.</span></div></div>
+            <div class="list-row list-row-tall"><div><strong>Payments</strong><span>Razorpay order and payment identifiers are stored for verification. Card details are handled by Razorpay, not by VidSnapAI.</span></div></div>
+            <div class="list-row list-row-tall"><div><strong>Social connections</strong><span>When users connect Meta accounts, tokens and account metadata are stored securely to support reconnect, publishing, and scheduling.</span></div></div>
+            <div class="list-row list-row-tall"><div><strong>Contact</strong><span>Update this page with your support email and business contact before production launch.</span></div></div>
+        </div>
+    </div>
+</section>
+{% endblock %}

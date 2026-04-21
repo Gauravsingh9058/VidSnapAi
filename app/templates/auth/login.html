@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block public_content %}
+<section class="auth-section">
+    <div class="auth-card">
+        <div>
+            <span class="eyebrow">Welcome back</span>
+            <h1>Log in to your content engine</h1>
+            <p>Access your dashboard, video history, scheduler, and connected social accounts.</p>
+        </div>
+        <form method="post" class="stack-form">
+            {{ form.hidden_tag() }}
+            <label>
+                <span>Email</span>
+                {{ form.email(class="input") }}
+            </label>
+            <label>
+                <span>Password</span>
+                {{ form.password(class="input") }}
+            </label>
+            {{ form.submit(class="button button-primary button-block") }}
+        </form>
+        <div class="auth-links">
+            <a href="{{ url_for('auth.forgot_password') }}">Forgot password?</a>
+            <a href="{{ url_for('auth.signup') }}">Create account</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

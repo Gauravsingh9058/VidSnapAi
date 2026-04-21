@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="dashboard-grid social-layout">
+    <article class="panel large-panel">
+        <div class="panel-header">
+            <div>
+                <span class="eyebrow">Meta connections</span>
+                <h2>Connect real Instagram and Facebook assets</h2>
+            </div>
+            <span class="pill">{{ accounts|length }}/{{ social_account_limit }} connected</span>
+        </div>
+
+        <div class="social-connect-grid">
+            <article class="connect-option">
+                <div class="connect-option-top">
+                    <span class="platform-icon">IG</span>
+                    <div>
+                        <h3>Connect Instagram</h3>
+                        <p>Connect your eligible Instagram professional account for future direct publishing.</p>
+                    </div>
+                </div>
+                <ul class="clean-list compact-list">
+                    <li>Meta OAuth callback with secure state validation</li>
+                    <li>Discovers Instagram professional accounts linked to accessible Pages</li>
+                    <li>Supports reconnect and future publishing expansion</li>
+                </ul>
+                <div class="button-row">
+                    <a class="button button-primary" href="{{ url_for('social.connect', platform='instagram') }}">Connect Instagram</a>
+                    {% if instagram_accounts %}
+                        <span class="inline-note">{{ instagram_accounts|length }} connected</span>
+                    {% endif %}
+                </div>
+            </article>
+
+            <article class="connect-option">
+                <div class="connect-option-top">
+                    <span class="platform-icon">FB</span>
+                    <div>
+                        <h3>Connect Facebook Page</h3>
+                        <p>Connect a Facebook Page to enable future direct publishing and scheduling.</p>
+                    </div>
+                </div>
+                <ul class="clean-list compact-list">
+                    <li>Fetches real Page assets after Meta authorization</li>
+                    <li>Stores page tokens and metadata for later publishing flows</li>
+                    <li>Supports asset selection when multiple Pages are available</li>
+                </ul>
+                <div class="button-row">
+                    <a class="button button-primary" href="{{ url_for('social.connect', platform='facebook') }}">Connect Facebook Page</a>
+                    {% if facebook_accounts %}
+                        <span class="inline-note">{{ facebook_accounts|length }} connected</span>
+                    {% endif %}
+                </div>
+            </article>
+        </div>
+
+        <div class="setup-note">
+            <strong>Meta app configuration</strong>
+            {% if meta_configured %}
+                <p>Your Meta environment variables are configured, so VidSnapAI can start the real OAuth flow and discover accounts.</p>
+            {% else %}
+                <p>Add your Meta app credentials to `.env` before connecting accounts. The backend routes, callback handling, token exchange, and selection flow are already wired.</p>
+            {% endif %}
+        </div>
+        {% if not current_user.is_premium %}
+            <div class="setup-note">
+                <strong>Premium note</strong>
+                <p>You can connect one account on the free workspace, but direct publishing and scheduling unlock after upgrading.</p>
+            </div>
+        {% endif %}
+    </article>
+
+    <article class="panel">
+        <div class="panel-header">
+            <div>
+                <span class="eyebrow">Connection status</span>
+                <h2>Connected accounts dashboard</h2>
+            </div>
+        </div>
+
+        {% if accounts %}
+            <div class="stack-list">
+                {% for account in accounts %}
+                    <article class="account-status-card">
+                        <div class="account-status-top">
+                            <div>
+                                <span class="status status-{{ account.platform }}">{{ account.platform|title }}</span>
+                                <strong>{{ account.account_name }}</strong>
+                            </div>
+                            <span class="status status-{{ account.status|replace(' ', '-') }}">{{ account.status }}</span>
+                        </div>
+                        <div class="detail-list compact-detail-list">
+                            <div><span>Account ID</span><strong>{{ account.account_id }}</strong></div>
+                            <div><span>Page ID</span><strong>{{ account.page_id or 'Not applicable' }}</strong></div>
+                            <div><span>Username</span><strong>{{ account.username or 'Unavailable' }}</strong></div>
+                            <div><span>Updated</span><strong>{{ account.updated_at.strftime('%d %b %Y, %H:%M') }}</strong></div>
+                        </div>
+                        {% if account.last_error %}
+                            <small class="error-copy">{{ account.last_error }}</small>
+                        {% endif %}
+                        <div class="button-row">
+                            <form method="post" action="{{ url_for('social.refresh', account_id=account.id) }}">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button class="button button-secondary" type="submit">Refresh</button>
+                            </form>
+                            <form method="post" action="{{ url_for('social.reconnect', account_id=account.id) }}">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button class="button button-ghost" type="submit">Reconnect</button>
+                            </form>
+                            <form method="post" action="{{ url_for('social.disconnect', account_id=account.id) }}">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button class="button button-ghost" type="submit">Disconnect</button>
+                            </form>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state premium-empty">
+                <strong>No social accounts connected yet</strong>
+                <p>Connecting Instagram and Facebook unlocks real asset discovery, publishing-ready tokens, and a cleaner path to direct posting and scheduling.</p>
+            </div>
+        {% endif %}
+    </article>
+</section>
+{% endblock %}

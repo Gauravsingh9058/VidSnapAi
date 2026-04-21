@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="dashboard-grid">
+    <article class="panel large-panel">
+        <div class="panel-header">
+            <div>
+                <span class="eyebrow">Generated videos</span>
+                <h2>Content library</h2>
+            </div>
+        </div>
+        {% if videos %}
+            <div class="video-grid">
+                {% for video in videos %}
+                    <article class="video-card">
+                        <div class="video-thumb">
+                            {% if video.thumbnail_path %}
+                                <img src="{{ url_for('video.stream_thumbnail', video_id=video.id) }}" alt="{{ video.title }}">
+                            {% else %}
+                                <div class="thumb-placeholder">No thumbnail</div>
+                            {% endif %}
+                        </div>
+                        <div class="video-meta">
+                            <strong>{{ video.title }}</strong>
+                            <span>{{ video.topic }}</span>
+                            <span class="status status-{{ video.status }}">{{ video.status }}</span>
+                        </div>
+                        <div class="button-row">
+                            <a class="button button-secondary" href="{{ url_for('video.preview', video_id=video.id) }}">Preview</a>
+                            {% if video.is_ready %}
+                                <a class="button button-ghost" href="{{ url_for('video.download_video', video_id=video.id) }}">Download</a>
+                            {% endif %}
+                            <form method="post" action="{{ url_for('video.delete_video', video_id=video.id) }}">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <input type="hidden" name="next" value="{{ url_for('history.index') }}">
+                                <button class="button button-ghost" type="submit">Delete</button>
+                            </form>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <strong>No generated videos yet</strong>
+                <p>Your completed video projects will appear here.</p>
+            </div>
+        {% endif %}
+    </article>
+
+    <article class="panel">
+        <div class="panel-header">
+            <div>
+                <span class="eyebrow">Posting history</span>
+                <h2>Recent post jobs</h2>
+            </div>
+        </div>
+        {% if jobs %}
+            <div class="stack-list">
+                {% for job in jobs %}
+                    <div class="list-row list-row-tall">
+                        <div>
+                            <strong>{{ job.video.title }}</strong>
+                            <span>{{ job.platform|default('Draft', true)|title }}</span>
+                            <small>{{ job.published_time.strftime('%d %b %Y, %H:%M') if job.published_time else (job.scheduled_time.strftime('%d %b %Y, %H:%M') if job.scheduled_time else 'Not scheduled') }}</small>
+                        </div>
+                        <span class="status status-{{ job.status|replace(' ', '-') }}">{{ job.status }}</span>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <strong>No post jobs yet</strong>
+                <p>Drafts, scheduled items, and published posts will show here.</p>
+            </div>
+        {% endif %}
+    </article>
+</section>
+{% endblock %}

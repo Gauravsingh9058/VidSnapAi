@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block public_content %}
+<section class="section pricing-page">
+    <div class="section-heading narrow">
+        <span class="eyebrow">Pricing</span>
+        <h1>One lifetime plan for your content engine</h1>
+        <p>VidSnapAI now ships as a single premium lifetime offer so you can create, connect, caption, and publish without juggling plan upgrades.</p>
+    </div>
+    <div class="pricing-row">
+        {% for plan in plans %}
+            <article class="pricing-card {% if plan.highlight %}featured-plan{% endif %}">
+                <span class="plan-name">{{ plan.name }}</span>
+                <strong>{{ plan.price }}</strong>
+                <p>{{ plan.subtitle }}</p>
+                <ul class="clean-list">
+                    {% for feature in plan.features %}
+                        <li>{{ feature }}</li>
+                    {% endfor %}
+                </ul>
+                {% if plan.slug == 'free' %}
+                    <a class="button button-secondary" href="{% if current_user.is_authenticated %}{{ url_for('dashboard.index') }}{% else %}{{ url_for('auth.signup') }}{% endif %}">Start free</a>
+                {% elif current_user.is_authenticated %}
+                    <a class="button {% if plan.highlight %}button-primary{% else %}button-secondary{% endif %}" href="{{ url_for('billing.index') }}">Upgrade now</a>
+                {% else %}
+                    <a class="button {% if plan.highlight %}button-primary{% else %}button-secondary{% endif %}" href="{{ url_for('auth.signup') }}">Create account</a>
+                {% endif %}
+            </article>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

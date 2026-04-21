@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="dashboard-grid">
+    <article class="panel large-panel">
+        <div class="panel-header">
+            <div>
+                <span class="eyebrow">Billing</span>
+                <h2>Upgrade your workspace to lifetime premium</h2>
+            </div>
+            <span class="pill">{% if current_user.is_premium %}Premium active{% else %}Free plan{% endif %}</span>
+        </div>
+        <div class="stack-list">
+            <div class="list-row list-row-tall">
+                <div>
+                    <strong>Watermark-free exports</strong>
+                    <span>Deliver finished reels without the free-tier overlay.</span>
+                </div>
+            </div>
+            <div class="list-row list-row-tall">
+                <div>
+                    <strong>Direct publishing and scheduling</strong>
+                    <span>Unlock the real SaaS workflow after login, generation, and checkout.</span>
+                </div>
+            </div>
+            <div class="list-row list-row-tall">
+                <div>
+                    <strong>One-time payment</strong>
+                    <span>Razorpay checkout upgrades the same user account instantly.</span>
+                </div>
+            </div>
+        </div>
+
+        {% if current_user.is_premium %}
+            <div class="empty-state">
+                <strong>Lifetime premium is already active</strong>
+                <p>Your account can already export without watermark, schedule posts, and publish directly.</p>
+            </div>
+        {% elif razorpay_ready %}
+            <form method="post" action="{{ url_for('billing.checkout') }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button class="button button-primary" type="submit">Open Razorpay checkout</button>
+            </form>
+        {% else %}
+            <div class="empty-state">
+                <strong>Razorpay keys not configured yet</strong>
+                <p>Add your `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, and webhook secret in `.env` to accept payments.</p>
+            </div>
+        {% endif %}
+    </article>
+
+    <article class="panel">
+        <div class="panel-header">
+            <div>
+                <span class="eyebrow">Latest payment</span>
+                <h2>Transaction status</h2>
+            </div>
+        </div>
+        {% if latest_payment %}
+            <div class="detail-list">
+                <div><span>Order ID</span><strong>{{ latest_payment.order_id }}</strong></div>
+                <div><span>Status</span><strong class="status status-{{ latest_payment.status }}">{{ latest_payment.status }}</strong></div>
+                <div><span>Amount</span><strong>{{ latest_payment.amount / 100 }} {{ latest_payment.currency }}</strong></div>
+                <div><span>Plan</span><strong>{{ latest_payment.plan|title }}</strong></div>
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <strong>No payments yet</strong>
+                <p>Your first Razorpay order will appear here after checkout starts.</p>
+            </div>
+        {% endif %}
+    </article>
+</section>
+{% endblock %}

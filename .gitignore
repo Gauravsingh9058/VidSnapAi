@@ -1,0 +1,11 @@
+.env
+__pycache__/
+*.pyc
+instance/*.db
+instance/*.db-journal
+instance/*.txt
+smoke*.db
+smoke*.db-journal
+app/uploads/
+user_uploads/
+static/reels/

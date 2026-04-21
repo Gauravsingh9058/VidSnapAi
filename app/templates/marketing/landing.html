@@ -1,0 +1,258 @@
+{% extends "base.html" %}
+
+{% block public_content %}
+<section class="hero hero-grid">
+    <div>
+        <span class="eyebrow">Your AI social media content engine</span>
+        <h1>Create Viral Reels in Minutes with AI</h1>
+        <p class="hero-copy">Generate videos, write captions, and publish directly to Instagram & Facebook from one dashboard.</p>
+        <div class="button-row">
+            <a class="button button-primary" href="{% if current_user.is_authenticated %}{{ url_for('billing.index') }}{% else %}{{ url_for('auth.signup') }}{% endif %}">Get Lifetime Access</a>
+            <a class="button button-secondary" href="#demo">Watch Demo</a>
+        </div>
+        <div class="hero-stat-row">
+            <div class="stat-chip">
+                <strong>1 workflow</strong>
+                <span>Upload, generate, caption, publish</span>
+            </div>
+            <div class="stat-chip">
+                <strong>3 languages</strong>
+                <span>English, Hindi, Hinglish</span>
+            </div>
+            <div class="stat-chip">
+                <strong>Limited launch</strong>
+                <span>Rs 399 lifetime for early customers</span>
+            </div>
+        </div>
+    </div>
+    <div class="hero-card">
+        <div class="floating-panel">
+            <span class="pill">New</span>
+            <strong>Campaign studio</strong>
+            <p>Turn your ideas into viral reels with smart templates, caption AI, and social scheduling in one premium workspace.</p>
+        </div>
+        <div class="dashboard-preview">
+            <div class="mini-card">
+                <span class="mini-label">Generated today</span>
+                <strong>18 reels</strong>
+            </div>
+            <div class="mini-card">
+                <span class="mini-label">Connected</span>
+                <strong>Instagram + Facebook</strong>
+            </div>
+            <div class="preview-video-frame">
+                <div class="preview-screen">
+                    <span>Upload assets</span>
+                    <strong>Generate captions</strong>
+                    <span>Publish instantly</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="demo" class="section">
+    <div class="section-heading">
+        <span class="eyebrow">Demo</span>
+        <h2>See the app go from raw assets to publish-ready reel</h2>
+        <p>Use the exact workflow your customers will log into: create a project, wait for background processing, then preview, download, or publish.</p>
+    </div>
+    <div class="dashboard-grid">
+        <article class="panel large-panel">
+            <div class="video-player-shell marketing-video-shell">
+                <video controls playsinline class="preview-player">
+                    <source src="{{ url_for('static', filename='reels/11af8e90-2c16-11f0-8d78-ad551e1c593a.mp4') }}" type="video/mp4">
+                </video>
+            </div>
+        </article>
+        <article class="panel">
+            <div class="stack-list">
+                <div class="list-row list-row-tall">
+                    <div>
+                        <strong>Step 1</strong>
+                        <span>User signs up and starts a project</span>
+                    </div>
+                </div>
+                <div class="list-row list-row-tall">
+                    <div>
+                        <strong>Step 2</strong>
+                        <span>Background job generates reel + caption bundle</span>
+                    </div>
+                </div>
+                <div class="list-row list-row-tall">
+                    <div>
+                        <strong>Step 3</strong>
+                        <span>Premium users publish or schedule directly</span>
+                    </div>
+                </div>
+            </div>
+        </article>
+    </div>
+</section>
+
+<section id="features" class="section">
+    <div class="section-heading">
+        <span class="eyebrow">Feature stack</span>
+        <h2>Built for creators, operators, and growth teams</h2>
+    </div>
+    <div class="feature-grid">
+        <article class="feature-panel">
+            <h3>AI reel generation</h3>
+            <p>Upload images or a video, choose a format, and turn raw assets into ready-to-publish reels.</p>
+        </article>
+        <article class="feature-panel">
+            <h3>Viral caption generation</h3>
+            <p>Generate a main caption, short caption, CTA, hashtags, and first comment from one idea.</p>
+        </article>
+        <article class="feature-panel">
+            <h3>Multi-language support</h3>
+            <p>Create in English, Hindi, or Hinglish to match your audience and brand tone.</p>
+        </article>
+        <article class="feature-panel">
+            <h3>Direct social posting</h3>
+            <p>Connect real Instagram professional accounts and Facebook Pages with a Meta Graph API aligned architecture.</p>
+        </article>
+        <article class="feature-panel">
+            <h3>Scheduled posting</h3>
+            <p>Queue posts, manage publishing windows, and track status from a dedicated scheduler view.</p>
+        </article>
+        <article class="feature-panel">
+            <h3>Content history dashboard</h3>
+            <p>Review generated videos, captions, platforms posted to, timestamps, and post outcomes.</p>
+        </article>
+    </div>
+</section>
+
+<section class="section">
+    <div class="section-heading">
+        <span class="eyebrow">Before / After</span>
+        <h2>From scattered process to sellable product</h2>
+    </div>
+    <div class="feature-grid">
+        {% for item in before_after %}
+            <article class="feature-panel">
+                <span class="eyebrow">Before</span>
+                <p>{{ item.before }}</p>
+                <span class="eyebrow">After</span>
+                <p>{{ item.after }}</p>
+            </article>
+        {% endfor %}
+    </div>
+</section>
+
+<section id="workflow" class="section workflow-section">
+    <div class="section-heading">
+        <span class="eyebrow">How it works</span>
+        <h2>Generate, caption, and publish in one workflow</h2>
+    </div>
+    <div class="steps-grid">
+        <article class="step-card">
+            <span class="step-number">01</span>
+            <h3>Upload your assets</h3>
+            <p>Drop in images, an optional video, and the idea or script behind your campaign.</p>
+        </article>
+        <article class="step-card">
+            <span class="step-number">02</span>
+            <h3>Pick the style</h3>
+            <p>Select language, duration, aspect ratio, template, tone, and CTA intensity.</p>
+        </article>
+        <article class="step-card">
+            <span class="step-number">03</span>
+            <h3>Preview and publish</h3>
+            <p>Review the finished video, polish the caption, post now, or schedule for later.</p>
+        </article>
+    </div>
+</section>
+
+<section class="section testimonials-section">
+    <div class="section-heading">
+        <span class="eyebrow">Social proof</span>
+        <h2>Why creators love it</h2>
+    </div>
+    <div class="testimonial-grid">
+        {% for testimonial in testimonials %}
+            <article class="testimonial-card">
+                <p>"{{ testimonial.quote }}"</p>
+                <strong>{{ testimonial.name }}</strong>
+                <span>{{ testimonial.role }}</span>
+            </article>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="section use-case-section">
+    <div class="section-heading">
+        <span class="eyebrow">Use cases</span>
+        <h2>Create once. Publish everywhere.</h2>
+    </div>
+    <div class="use-case-grid">
+        <div class="use-case-card">
+            <h3>Content creators</h3>
+            <p>Turn rough ideas into high-frequency reel content without juggling five different tools.</p>
+        </div>
+        <div class="use-case-card">
+            <h3>Small businesses</h3>
+            <p>Showcase offers, testimonials, launches, and behind-the-scenes moments with professional polish.</p>
+        </div>
+        <div class="use-case-card">
+            <h3>Coaches and personal brands</h3>
+            <p>Build authority with educational snippets, storytelling clips, and clear CTAs for engagement.</p>
+        </div>
+    </div>
+</section>
+
+<section class="section pricing-preview">
+    <div class="section-heading">
+        <span class="eyebrow">Pricing preview</span>
+        <h2>One-time pricing for the full workflow</h2>
+    </div>
+    <div class="pricing-row">
+        <article class="pricing-card featured-plan">
+            <span class="plan-name">Lifetime</span>
+            <strong>Rs 399</strong>
+            <p>Unlimited videos, premium templates, real Meta connection flow, scheduling, publishing-ready architecture, and watermark-free exports.</p>
+        </article>
+    </div>
+    <div class="section-actions">
+        <a class="button button-primary" href="{{ url_for('marketing.pricing') }}">View full pricing</a>
+    </div>
+</section>
+
+<section class="section faq-section">
+    <div class="section-heading">
+        <span class="eyebrow">FAQ</span>
+        <h2>Answers before you launch your first workflow</h2>
+    </div>
+    <div class="faq-list">
+        {% for question, answer in faqs %}
+            <article class="faq-item">
+                <h3>{{ question }}</h3>
+                <p>{{ answer }}</p>
+            </article>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="cta-banner">
+    <div>
+        <span class="eyebrow">Final CTA</span>
+        <h2>Turn your ideas into viral reels.</h2>
+        <p>Build your social content pipeline inside one premium dashboard. Early launch pricing is live right now.</p>
+    </div>
+    <a class="button button-primary" href="{% if current_user.is_authenticated %}{{ url_for('billing.index') }}{% else %}{{ url_for('auth.signup') }}{% endif %}">Get lifetime access</a>
+</section>
+
+<footer class="marketing-footer">
+    <div>
+        <strong>{{ brand_name }}</strong>
+        <p>Create reels, generate captions, and publish directly to Instagram & Facebook.</p>
+    </div>
+    <div class="footer-links">
+        <a href="{{ url_for('marketing.pricing') }}">Pricing</a>
+        <a href="{{ url_for('marketing.privacy') }}">Privacy</a>
+        <a href="{{ url_for('marketing.terms') }}">Terms</a>
+        <a href="{{ url_for('auth.login') }}">Login</a>
+        <a href="{% if current_user.is_authenticated %}{{ url_for('billing.index') }}{% else %}{{ url_for('auth.signup') }}{% endif %}">Get lifetime access</a>
+    </div>
+</footer>
+{% endblock %}

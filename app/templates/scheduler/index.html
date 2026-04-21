@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="panel">
+    <div class="panel-header">
+        <div>
+            <span class="eyebrow">Scheduler</span>
+            <h2>Queued and published posts</h2>
+        </div>
+    </div>
+    {% if jobs %}
+        <div class="schedule-list">
+            {% for job in jobs %}
+                <article class="schedule-card">
+                    <div>
+                        <strong>{{ job.video.title }}</strong>
+                        <p>{{ job.platform|default('Draft', true)|title }} • {{ job.caption_text[:110] }}{% if job.caption_text and job.caption_text|length > 110 %}...{% endif %}</p>
+                    </div>
+                    <div class="schedule-meta">
+                        <span class="status status-{{ job.status|replace(' ', '-') }}">{{ job.status }}</span>
+                        <span>{{ job.scheduled_time.strftime('%d %b %Y, %H:%M') if job.scheduled_time else 'No schedule set' }}</span>
+                    </div>
+                    <div class="button-row">
+                        {% if job.status in ['pending', 'failed'] %}
+                            <form method="post" action="{{ url_for('scheduler.reschedule', job_id=job.id) }}" class="inline-form">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <input class="input" type="datetime-local" name="scheduled_time" value="{{ job.scheduled_time.strftime('%Y-%m-%dT%H:%M') if job.scheduled_time else '' }}">
+                                <button class="button button-secondary" type="submit">Edit time</button>
+                            </form>
+                            <form method="post" action="{{ url_for('scheduler.cancel', job_id=job.id) }}">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button class="button button-ghost" type="submit">Cancel</button>
+                            </form>
+                        {% endif %}
+                    </div>
+                    {% if job.error_message %}
+                        <small class="error-copy">{{ job.error_message }}</small>
+                    {% endif %}
+                </article>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <strong>No scheduled jobs yet</strong>
+            <p>Schedule a post from the preview page to manage it here.</p>
+        </div>
+    {% endif %}
+</section>
+{% endblock %}

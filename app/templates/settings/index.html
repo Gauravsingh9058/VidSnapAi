@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="dashboard-grid">
+    <article class="panel">
+        <div class="panel-header">
+            <div>
+                <span class="eyebrow">Profile settings</span>
+                <h2>Account details</h2>
+            </div>
+        </div>
+        <form method="post" class="stack-form">
+            {{ profile_form.hidden_tag() }}
+            <input type="hidden" name="form_name" value="profile">
+            <label><span>Name</span>{{ profile_form.name(class="input") }}</label>
+            <label><span>Email</span>{{ profile_form.email(class="input") }}</label>
+            <div class="static-field">
+                <span>Subscription plan</span>
+                {% if current_user.is_premium %}
+                    <strong>Lifetime Access • Active</strong>
+                    <small>Premium is unlocked on this account{% if current_user.premium_activated_at %} since {{ current_user.premium_activated_at.strftime('%d %b %Y') }}{% endif %}.</small>
+                {% else %}
+                    <strong>Free Workspace</strong>
+                    <small>Upgrade to unlock watermark-free exports, scheduling, and direct publishing.</small>
+                {% endif %}
+            </div>
+            {% if not current_user.is_premium %}
+                <a class="button button-secondary button-block" href="{{ url_for('billing.index') }}">Open billing</a>
+            {% endif %}
+            {{ profile_form.submit(class="button button-primary button-block") }}
+        </form>
+    </article>
+
+    <article class="panel">
+        <div class="panel-header">
+            <div>
+                <span class="eyebrow">Password</span>
+                <h2>Update password</h2>
+            </div>
+        </div>
+        <form method="post" class="stack-form">
+            {{ password_form.hidden_tag() }}
+            <input type="hidden" name="form_name" value="password">
+            <label><span>Current password</span>{{ password_form.current_password(class="input") }}</label>
+            <label><span>New password</span>{{ password_form.new_password(class="input") }}</label>
+            <label><span>Confirm password</span>{{ password_form.confirm_password(class="input") }}</label>
+            {{ password_form.submit(class="button button-secondary button-block") }}
+        </form>
+    </article>
+</section>
+
+<section class="dashboard-grid">
+    <article class="panel">
+        <div class="panel-header">
+            <div>
+                <span class="eyebrow">Notifications</span>
+                <h2>Preferences</h2>
+            </div>
+        </div>
+        <form method="post" class="stack-form">
+            {{ notification_form.hidden_tag() }}
+            <input type="hidden" name="form_name" value="notifications">
+            <label class="checkbox-row">{{ notification_form.notify_product_updates() }}<span>Product updates</span></label>
+            <label class="checkbox-row">{{ notification_form.notify_scheduled_posts() }}<span>Scheduled post reminders</span></label>
+            <label class="checkbox-row">{{ notification_form.notify_failures() }}<span>Publishing failure alerts</span></label>
+            {{ notification_form.submit(class="button button-primary button-block") }}
+        </form>
+    </article>
+
+    <article class="panel">
+        <div class="panel-header">
+            <div>
+                <span class="eyebrow">Reconnect accounts</span>
+                <h2>Social account status</h2>
+            </div>
+        </div>
+        {% if reconnect_accounts %}
+            <div class="stack-list">
+                {% for account in reconnect_accounts %}
+                    <div class="list-row list-row-tall">
+                        <div>
+                            <strong>{{ account.account_name }}</strong>
+                            <span>{{ account.platform|title }}</span>
+                        </div>
+                        <div class="button-row">
+                            <span class="status status-{{ account.status|replace(' ', '-') }}">{{ account.status }}</span>
+                            <form method="post" action="{{ url_for('social.reconnect', account_id=account.id) }}">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button class="button button-ghost" type="submit">Reconnect</button>
+                            </form>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <strong>No accounts yet</strong>
+                <p>Connect accounts from the social accounts page.</p>
+            </div>
+        {% endif %}
+    </article>
+</section>
+
+<section class="panel danger-panel">
+    <div class="panel-header">
+        <div>
+            <span class="eyebrow">Danger zone</span>
+            <h2>Delete account</h2>
+        </div>
+    </div>
+    <form method="post" class="stack-form">
+        {{ delete_form.hidden_tag() }}
+        <input type="hidden" name="form_name" value="delete">
+        <label>
+            <span>Type DELETE to confirm</span>
+            {{ delete_form.confirm_text(class="input") }}
+        </label>
+        {{ delete_form.submit(class="button button-danger") }}
+    </form>
+</section>
+{% endblock %}

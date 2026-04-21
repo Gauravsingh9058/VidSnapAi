@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block public_content %}
+<section class="auth-section">
+    <div class="auth-card">
+        <div>
+            <span class="eyebrow">Lifetime access</span>
+            <h1>Create your VidSnapAI account</h1>
+            <p>Generate reels, build captions, connect social accounts, and publish from one dashboard.</p>
+        </div>
+        <form method="post" class="stack-form">
+            {{ form.hidden_tag() }}
+            <label>
+                <span>Full name</span>
+                {{ form.name(class="input") }}
+            </label>
+            <label>
+                <span>Email</span>
+                {{ form.email(class="input") }}
+            </label>
+            <label>
+                <span>Password</span>
+                {{ form.password(class="input") }}
+            </label>
+            <label>
+                <span>Confirm password</span>
+                {{ form.confirm_password(class="input") }}
+            </label>
+            {{ form.submit(class="button button-primary button-block") }}
+        </form>
+        <div class="auth-links">
+            <a href="{{ url_for('auth.login') }}">Already have an account? Log in</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

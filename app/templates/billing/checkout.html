@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="panel">
+    <div class="panel-header">
+        <div>
+            <span class="eyebrow">Razorpay checkout</span>
+            <h2>Confirm your lifetime upgrade</h2>
+        </div>
+        <span class="pill">Order {{ order.id }}</span>
+    </div>
+    <div class="detail-list">
+        <div><span>Amount</span><strong>{{ order.amount / 100 }} {{ order.currency }}</strong></div>
+        <div><span>Plan</span><strong>Lifetime Access</strong></div>
+        <div><span>Email</span><strong>{{ billing_email }}</strong></div>
+    </div>
+    <div class="button-row">
+        <button class="button button-primary" type="button" id="open-razorpay-checkout">Pay now</button>
+        <a class="button button-ghost" href="{{ url_for('billing.index') }}">Back</a>
+    </div>
+</section>
+
+<form id="razorpay-verify-form" method="post" action="{{ url_for('billing.verify') }}" hidden>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="razorpay_order_id" id="razorpay_order_id">
+    <input type="hidden" name="razorpay_payment_id" id="razorpay_payment_id">
+    <input type="hidden" name="razorpay_signature" id="razorpay_signature">
+</form>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+    const checkoutButton = document.getElementById("open-razorpay-checkout");
+    if (checkoutButton) {
+        checkoutButton.addEventListener("click", () => {
+            const razorpay = new Razorpay({
+                key: "{{ razorpay_key_id }}",
+                amount: "{{ order.amount }}",
+                currency: "{{ order.currency }}",
+                name: "VidSnapAI",
+                description: "Lifetime access upgrade",
+                order_id: "{{ order.id }}",
+                prefill: {
+                    name: "{{ billing_name }}",
+                    email: "{{ billing_email }}"
+                },
+                handler: function (response) {
+                    document.getElementById("razorpay_order_id").value = response.razorpay_order_id;
+                    document.getElementById("razorpay_payment_id").value = response.razorpay_payment_id;
+                    document.getElementById("razorpay_signature").value = response.razorpay_signature;
+                    document.getElementById("razorpay-verify-form").submit();
+                }
+            });
+            razorpay.open();
+        });
+    }
+</script>
+{% endblock %}

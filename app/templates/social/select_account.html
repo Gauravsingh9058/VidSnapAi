@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="panel">
+    <div class="panel-header">
+        <div>
+            <span class="eyebrow">Account selection</span>
+            <h2>Choose the {{ selection.platform|title }} asset to connect</h2>
+        </div>
+        <span class="pill">Expires soon</span>
+    </div>
+
+    <form method="post" action="{{ url_for('social.select_account') }}" class="stack-form">
+        {{ form.hidden_tag() }}
+        {{ form.selection_id }}
+        <div class="selection-grid">
+            {% for subfield in form.asset_key %}
+                {% set parts = subfield.label.text.split('|') %}
+                <label class="selection-card">
+                    <div class="selection-radio">
+                        {{ subfield }}
+                        <span class="platform-icon">{{ 'IG' if selection.platform == 'instagram' else 'FB' }}</span>
+                    </div>
+                    <div>
+                        <strong>{{ parts[0] }}</strong>
+                        <p>{{ parts[1] if parts[1] else parts[2] }}</p>
+                        <small>ID: {{ parts[3] }}</small>
+                    </div>
+                </label>
+            {% endfor %}
+        </div>
+        <div class="button-row">
+            {{ form.submit(class="button button-primary") }}
+            <a class="button button-secondary" href="{{ url_for('social.index') }}">Cancel</a>
+        </div>
+    </form>
+</section>
+{% endblock %}

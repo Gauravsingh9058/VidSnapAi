@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ title or brand_name }} | {{ brand_name }}</title>
+    <meta name="description" content="Create reels, generate viral captions, and publish directly to Instagram & Facebook from one dashboard.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body class="{% if dashboard_shell %}dashboard-body{% else %}marketing-body{% endif %}">
+    {% if dashboard_shell %}
+        <div class="app-shell">
+            <aside class="sidebar" id="sidebar">
+                <a class="brand brand-sidebar" href="{{ url_for('dashboard.index') }}">
+                    <span class="brand-mark">VS</span>
+                    <span>
+                        <strong>{{ brand_name }}</strong>
+                        <small>Your AI social engine</small>
+                    </span>
+                </a>
+                <nav class="sidebar-nav">
+                    <a class="{% if active_page == 'dashboard' %}active{% endif %}" href="{{ url_for('dashboard.index') }}">Dashboard</a>
+                    <a class="{% if active_page == 'generate' %}active{% endif %}" href="{{ url_for('video.generate') }}">Generate</a>
+                    <a class="{% if active_page == 'accounts' %}active{% endif %}" href="{{ url_for('social.index') }}">Accounts</a>
+                    <a class="{% if active_page == 'scheduled' %}active{% endif %}" href="{{ url_for('scheduler.index') }}">Scheduled</a>
+                    <a class="{% if active_page == 'history' %}active{% endif %}" href="{{ url_for('history.index') }}">History</a>
+                    <a class="{% if active_page == 'billing' %}active{% endif %}" href="{{ url_for('billing.index') }}">Billing</a>
+                    <a href="{{ url_for('marketing.pricing') }}">Pricing</a>
+                    <a class="{% if active_page == 'settings' %}active{% endif %}" href="{{ url_for('settings.index') }}">Settings</a>
+                </nav>
+                <div class="sidebar-plan">
+                    <span class="eyebrow">Current plan</span>
+                    <strong>{{ plan_badges[current_user.plan_label] }}</strong>
+                    {% if current_user.is_premium %}
+                        <p>Lifetime access active</p>
+                        <a class="button button-secondary" href="{{ url_for('billing.index') }}">Billing details</a>
+                    {% else %}
+                        <p>Upgrade for watermark-free exports and direct publishing</p>
+                        <a class="button button-primary" href="{{ url_for('billing.index') }}">Upgrade now</a>
+                    {% endif %}
+                </div>
+            </aside>
+            <div class="content-shell">
+                <header class="topbar">
+                    <button class="sidebar-toggle" type="button" data-toggle-sidebar>Menu</button>
+                    <div>
+                        <p class="eyebrow">Premium SaaS workspace</p>
+                        <h1>{{ title or brand_name }}</h1>
+                    </div>
+                    <div class="topbar-user">
+                        <div>
+                            <strong>{{ current_user.name }}</strong>
+                            <small>{{ current_user.email }}</small>
+                        </div>
+                        <form method="post" action="{{ url_for('auth.logout') }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button class="button button-ghost" type="submit">Logout</button>
+                        </form>
+                    </div>
+                </header>
+                <main class="page-content">
+                    {% include "partials/flash.html" %}
+                    {% block content %}{% endblock %}
+                </main>
+            </div>
+        </div>
+    {% else %}
+        <div class="marketing-shell">
+            <header class="marketing-header">
+                <a class="brand" href="{{ url_for('marketing.landing') }}">
+                    <span class="brand-mark">VS</span>
+                    <span>{{ brand_name }}</span>
+                </a>
+                <nav class="marketing-nav">
+                    <a href="{{ url_for('marketing.landing') }}#features">Features</a>
+                    <a href="{{ url_for('marketing.landing') }}#workflow">How it works</a>
+                    <a href="{{ url_for('marketing.pricing') }}">Pricing</a>
+                    <a href="{{ url_for('marketing.privacy') }}">Privacy</a>
+                    {% if current_user.is_authenticated %}
+                        <a href="{{ url_for('dashboard.index') }}">Dashboard</a>
+                        <a class="button button-primary" href="{{ url_for('billing.index') }}">Upgrade</a>
+                    {% else %}
+                        <a href="{{ url_for('auth.login') }}">Login</a>
+                        <a class="button button-primary" href="{{ url_for('auth.signup') }}">Get lifetime access</a>
+                    {% endif %}
+                </nav>
+            </header>
+            {% include "partials/flash.html" %}
+            <main>
+                {% block public_content %}{% endblock %}
+            </main>
+        </div>
+    {% endif %}
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="dashboard-grid generation-layout">
+    <article class="panel large-panel">
+        <div class="panel-header">
+            <div>
+                <span class="eyebrow">Video generation</span>
+                <h2>Create a premium short-form asset</h2>
+            </div>
+            <span class="pill">{{ plan_badges[current_user.plan_label] }} plan</span>
+        </div>
+        {% if not current_user.is_premium %}
+            <div class="setup-note">
+                <strong>Free workspace mode</strong>
+                <p>Your free exports include a VidSnapAI watermark. Upgrade anytime for watermark-free downloads and direct publishing.</p>
+            </div>
+        {% endif %}
+        <form method="post" enctype="multipart/form-data" class="stack-form generation-form" data-loading-form>
+            {{ form.hidden_tag() }}
+            <div class="form-grid">
+                <label>
+                    <span>Project title</span>
+                    {{ form.title(class="input") }}
+                </label>
+                <label>
+                    <span>Topic</span>
+                    {{ form.topic(class="input") }}
+                </label>
+            </div>
+            <label>
+                <span>Script</span>
+                {{ form.script(class="input textarea") }}
+            </label>
+
+            <div class="upload-zone" data-dropzone>
+                <div>
+                    <strong>Drag and drop visuals here</strong>
+                    <p>Upload multiple images and optionally a supporting video or audio track.</p>
+                </div>
+                <div class="form-grid">
+                    <label>
+                        <span>Images</span>
+                        {{ form.images(class="input", multiple=true, data_file_label="images") }}
+                    </label>
+                    <label>
+                        <span>Optional video</span>
+                        {{ form.video_file(class="input", data_file_label="video") }}
+                    </label>
+                </div>
+                <label>
+                    <span>Optional background audio</span>
+                    {{ form.audio_file(class="input", data_file_label="audio") }}
+                </label>
+                <div class="file-summary" data-file-summary>No files selected yet.</div>
+            </div>
+
+            <div class="form-grid">
+                <label><span>Language</span>{{ form.language(class="input") }}</label>
+                <label><span>Content style</span>{{ form.style(class="input") }}</label>
+                <label><span>Duration</span>{{ form.duration(class="input") }}</label>
+                <label><span>Aspect ratio</span>{{ form.aspect_ratio(class="input") }}</label>
+                <label><span>Template</span>{{ form.template(class="input") }}</label>
+                <label><span>Tone</span>{{ form.tone(class="input") }}</label>
+                <label><span>Caption length</span>{{ form.caption_length(class="input") }}</label>
+                <label><span>CTA strength</span>{{ form.cta_strength(class="input") }}</label>
+            </div>
+
+            <label class="checkbox-row">
+                {{ form.emoji_enabled() }}
+                <span>Enable emojis in captions and first comment</span>
+            </label>
+
+            <div class="generation-footer">
+                <div class="progress-shell" data-loading-indicator hidden>
+                    <div class="progress-bar"></div>
+                    <span>Saving assets and queueing your background job...</span>
+                </div>
+                {{ form.submit(class="button button-primary") }}
+            </div>
+        </form>
+    </article>
+
+    <article class="panel">
+        <div class="panel-header">
+            <div>
+                <span class="eyebrow">Output</span>
+                <h2>What you get</h2>
+            </div>
+        </div>
+        <div class="stack-list">
+            <div class="list-row">
+                <div>
+                    <strong>Generated MP4</strong>
+                    <span>Slideshow-style reel with overlays</span>
+                </div>
+            </div>
+            <div class="list-row">
+                <div>
+                    <strong>Thumbnail cover</strong>
+                    <span>Ready for preview and downloads</span>
+                </div>
+            </div>
+            <div class="list-row">
+                <div>
+                    <strong>Caption bundle</strong>
+                    <span>Main caption, CTA, hashtags, first comment</span>
+                </div>
+            </div>
+        </div>
+        <div class="empty-state">
+            <strong>{% if current_user.is_premium %}Lifetime plan active{% else %}Upgrade path ready{% endif %}</strong>
+            <p>{% if current_user.is_premium %}Your lifetime access includes unlimited reel generation, premium templates, and the full Meta connection workflow architecture.{% else %}This workspace already supports Razorpay billing, premium access unlocks, and optional Cloudinary media storage for production use.{% endif %}</p>
+        </div>
+    </article>
+</section>
+{% endblock %}

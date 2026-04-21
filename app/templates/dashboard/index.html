@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="stats-grid">
+    <article class="metric-card">
+        <span>Total videos generated</span>
+        <strong>{{ stats.videos }}</strong>
+    </article>
+    <article class="metric-card">
+        <span>Connected accounts</span>
+        <strong>{{ stats.accounts }}</strong>
+    </article>
+    <article class="metric-card">
+        <span>Posts published</span>
+        <strong>{{ stats.published }}</strong>
+    </article>
+    <article class="metric-card">
+        <span>Scheduled posts</span>
+        <strong>{{ stats.scheduled }}</strong>
+    </article>
+</section>
+
+{% if not current_user.is_premium %}
+    <section class="panel premium-upsell">
+        <div class="panel-header">
+            <div>
+                <span class="eyebrow">Upgrade</span>
+                <h2>Unlock the paid SaaS flow</h2>
+            </div>
+            <a class="button button-primary" href="{{ url_for('billing.index') }}">Get lifetime access</a>
+        </div>
+        <p>Premium removes export watermarks and unlocks direct publishing, scheduling, and your Razorpay-powered lifetime plan.</p>
+    </section>
+{% endif %}
+
+<section class="dashboard-grid">
+    <article class="panel large-panel">
+        <div class="panel-header">
+            <div>
+                <span class="eyebrow">Quick generate</span>
+                <h2>Turn your next idea into a reel</h2>
+            </div>
+            <a class="button button-primary" href="{{ url_for('video.generate') }}">Generate now</a>
+        </div>
+        <div class="quick-actions">
+            <a class="quick-action" href="{{ url_for('video.generate') }}">Create reel</a>
+            <a class="quick-action" href="{{ url_for('social.index') }}">Connect accounts</a>
+            <a class="quick-action" href="{{ url_for('scheduler.index') }}">Open scheduler</a>
+            <a class="quick-action" href="{{ url_for('history.index') }}">Review history</a>
+        </div>
+    </article>
+
+    <article class="panel">
+        <div class="panel-header">
+            <div>
+                <span class="eyebrow">Scheduled widget</span>
+                <h2>Next publishing window</h2>
+            </div>
+        </div>
+        {% if upcoming_job %}
+            <div class="schedule-highlight">
+                <strong>{{ upcoming_job.video.title }}</strong>
+                <p>{{ upcoming_job.platform|title }} scheduled for {{ upcoming_job.scheduled_time.strftime('%d %b %Y, %H:%M') }}</p>
+                <span class="status status-{{ upcoming_job.status|replace(' ', '-') }}">{{ upcoming_job.status }}</span>
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <strong>No posts queued yet</strong>
+                <p>Schedule your first reel to keep your publishing pipeline moving.</p>
+            </div>
+        {% endif %}
+    </article>
+</section>
+
+<section class="dashboard-grid">
+    <article class="panel large-panel">
+        <div class="panel-header">
+            <div>
+                <span class="eyebrow">Recent videos</span>
+                <h2>Generated content</h2>
+            </div>
+        </div>
+        {% if recent_videos %}
+            <div class="video-grid">
+                {% for video in recent_videos %}
+                    <article class="video-card">
+                        <div class="video-thumb">
+                            {% if video.thumbnail_path %}
+                                <img src="{{ url_for('video.stream_thumbnail', video_id=video.id) }}" alt="{{ video.title }}">
+                            {% else %}
+                                <div class="thumb-placeholder">No thumbnail</div>
+                            {% endif %}
+                        </div>
+                        <div class="video-meta">
+                            <strong>{{ video.title }}</strong>
+                            <span>{{ video.template|replace('-', ' ')|title }} • {{ video.aspect_ratio }}</span>
+                            <span class="status status-{{ video.status }}">{{ video.status }}</span>
+                        </div>
+                        <div class="button-row">
+                            <a class="button button-secondary" href="{{ url_for('video.preview', video_id=video.id) }}">Open preview</a>
+                            <form method="post" action="{{ url_for('video.delete_video', video_id=video.id) }}">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <input type="hidden" name="next" value="{{ url_for('dashboard.index') }}">
+                                <button class="button button-ghost" type="submit">Delete</button>
+                            </form>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <strong>No videos yet</strong>
+                <p>Upload your first set of assets to start building content.</p>
+            </div>
+        {% endif %}
+    </article>
+
+    <article class="panel">
+        <div class="panel-header">
+            <div>
+                <span class="eyebrow">Social accounts</span>
+                <h2>Connection status</h2>
+            </div>
+        </div>
+        {% if social_accounts %}
+            <div class="stack-list">
+                {% for account in social_accounts %}
+                    <div class="list-row">
+                        <div>
+                            <strong>{{ account.account_name }}</strong>
+                            <span>{{ account.platform|title }}</span>
+                        </div>
+                        <span class="status status-{{ account.status|replace(' ', '-') }}">{{ account.status }}</span>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <strong>No accounts connected</strong>
+                <p>Connect Instagram or Facebook to publish directly from VidSnapAI.</p>
+            </div>
+        {% endif %}
+    </article>
+</section>
+
+<section class="panel">
+    <div class="panel-header">
+        <div>
+            <span class="eyebrow">Posting history</span>
+            <h2>Latest publishing activity</h2>
+        </div>
+    </div>
+    {% if recent_jobs %}
+        <div class="table-shell">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Video</th>
+                        <th>Platform</th>
+                        <th>Status</th>
+                        <th>Scheduled</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for job in recent_jobs %}
+                        <tr>
+                            <td>{{ job.video.title }}</td>
+                            <td>{{ job.platform|default('Draft', true)|title }}</td>
+                            <td><span class="status status-{{ job.status|replace(' ', '-') }}">{{ job.status }}</span></td>
+                            <td>{{ job.scheduled_time.strftime('%d %b %Y, %H:%M') if job.scheduled_time else 'Not scheduled' }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <strong>No post history yet</strong>
+            <p>Your publish and scheduling activity will appear here.</p>
+        </div>
+    {% endif %}
+</section>
+{% endblock %}
