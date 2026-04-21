@@ -91,6 +91,34 @@ python main.py
 
 9. Open `http://127.0.0.1:5000`.
 
+## Manual GitHub push
+
+This repo is prepared for manual GitHub pushes without leaking normal local secrets or runtime files:
+
+- `.env` is ignored
+- local SQLite files inside `instance/` are ignored
+- generated uploads in `app/uploads/`, `user_uploads/`, and `static/reels/` are ignored
+- virtual environments, IDE folders, caches, and logs are ignored
+
+Use this flow from the project folder:
+
+```bash
+git status
+git add .
+git commit -m "Update VidSnapAI"
+git remote -v
+git push -u origin main
+```
+
+If GitHub returns a permission error, the Git account currently authenticated on your machine does not have write access to the target repository. For `Reacher20-ui/VidSnapAi`, the account you push with must be added there with write permission.
+
+If you ever want to switch this codebase to a different GitHub repo, update the remote and push again:
+
+```bash
+git remote set-url origin https://github.com/<your-username>/<your-repo>.git
+git push -u origin main
+```
+
 ## Database
 
 - Default database: SQLite at `instance/vidsnapai.db`
